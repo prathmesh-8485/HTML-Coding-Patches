@@ -1,0 +1,97 @@
+<?php
+include('smtp/PHPMailerAutoload.php');
+include('includes/config.php');
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve form data
+    $name = $_POST["name"];
+    $email = $_POST["email"];
+    $number = $_POST["number"];
+    $location = $_POST["location"]; 
+    $amt = $_POST["amt"]; 
+    $message = $_POST["message"];
+
+    // Compose the email message
+    $email_message = "Name: $name\n";
+    $email_message .= "Email: $email\n";
+    $email_message .= "Mobile Number: $number\n";
+    $email_message .= "Location: $location\n"; 
+    $email_message .= "Donation Amount: $amt\n";
+    $email_message .= "Message:\n$message"; 
+
+    // // Insert data into the database
+    $query = mysqli_query($conn, "INSERT INTO donate(name,email,number,location,amt,message)  VALUES ('$name', '$email', '$number', '$location', '$amt', '$message')");
+    if ($query) {
+        // Data inserted successfully
+        echo "<script>alert('Data Saved Successfully'); </script>";
+    } else {
+        // Data insertion failed
+        echo "<script>alert('Something Went Wrong! Please Try Again...');</script>";
+    }
+
+}
+else
+{
+	echo "data not get";
+}
+
+
+
+// methis called smtp maikler
+echo smtp_mailer('prathuwakchaure15@gmail.com','Test','Here it is Todays Leads <br> <b>Name :</b> '.$name.'<br> <b>Mobile NUmber :</b> '.$number.'<br><b>Email Address :</b> '.$email.'<br> <b>message :</b> '.$message.'<br> <b>Donation Amount :</b> '.$amt.'<br><b>Location :</b> '.$location);
+
+echo smtp_mailer($email,'Your Response Is Submitted','Welcome '.$name.'..! <br> Dear '.$name.'<br>
+
+We are thrilled to extend our warmest welcome to you as a valued member of the [Youth Foundation] community! Your commitment to personal growth, leadership, and positive change is truly inspiring, and were excited to have you on board.
+
+At [Youth Foundation], we believe in nurturing the potential of young minds and empowering them to create a brighter future. Together, well embark on a journey of growth, learning, and meaningful impact.
+
+Please explore our website, connect with fellow members, and stay tuned for upcoming events and opportunities. Your participation and ideas will shape the future of our organization.
+
+Once again, welcome to the [Youth Foundation] family. Lets make a difference together!<br>
+
+Warm regards,<br>
+
+[Ganesh Kadam]<br>
+[Hanumannagar , Ambegoan Khurd , pune - 411046]<br>
+[Youth Foundation]<br>
+');
+
+
+
+
+echo "<script>document.location='donate.html';</script>";
+
+
+function smtp_mailer($to,$subject,$msg)
+{
+	$mail = new PHPMailer(); 
+	$mail->IsSMTP(); 
+	$mail->SMTPAuth = true; 
+	$mail->SMTPSecure = 'tls'; 
+	$mail->Host = "smtp.gmail.com";
+	$mail->Port = 587; 
+	$mail->IsHTML(true);
+	$mail->CharSet = 'UTF-8';
+	// $mail->SMTPDebug = 3; 
+	$mail->Username = "pratapcgpi@gmail.com";
+	$mail->Password = "dlocuqskqkdubuyf";
+	$mail->SetFrom("pratapcgpi@gmail.com");
+	$mail->Subject = $subject;
+	$mail->Body =$msg;
+	$mail->AddAddress($to);
+	$mail->SMTPOptions=array('ssl'=>array(
+		'verify_peer'=>false,
+		'verify_peer_name'=>false,
+		'allow_self_signed'=>false
+	));
+	if(!$mail->Send())
+	{
+		echo $mail->ErrorInfo;
+	}
+	else
+	{
+		return '0';
+	}
+}
+?>
